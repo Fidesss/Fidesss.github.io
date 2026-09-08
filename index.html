@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장동혁 — Backend Engineer</title>
+<meta name="description" content="Spring 백엔드 엔지니어 장동혁의 소개 — B-dink에서 설계·구현한 도메인과 구조화 작업">
+
+<meta property="og:title" content="장동혁 — Backend Engineer">
+<meta property="og:description" content="Spring 백엔드 엔지니어 장동혁의 소개 — B-dink에서 설계·구현한 도메인과 구조화 작업">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,18..72,400;0,18..72,500;1,18..72,400&display=swap">
+
+<style>
+  :root {
+    --bg: #f6f8f7;
+    --surface: #ffffff;
+    --surface-2: #eef1ef;
+    --ink: #17201e;
+    --muted: #56615d;
+    --faint: #8a938f;
+    --line: #e1e6e3;
+    --accent: #0f766e;
+    --accent-soft: #d9ece8;
+    --code-ink: #0b473f;
+    --shadow: 0 1px 2px rgba(23, 32, 30, .04), 0 8px 24px rgba(23, 32, 30, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1413;
+      --surface: #161d1b;
+      --surface-2: #1d2523;
+      --ink: #e7ece9;
+      --muted: #9aa4a0;
+      --faint: #6b7571;
+      --line: #273230;
+      --accent: #2dd4bf;
+      --accent-soft: #14322e;
+      --code-ink: #86e5d8;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1413;
+    --surface: #161d1b;
+    --surface-2: #1d2523;
+    --ink: #e7ece9;
+    --muted: #9aa4a0;
+    --faint: #6b7571;
+    --line: #273230;
+    --accent: #2dd4bf;
+    --accent-soft: #14322e;
+    --code-ink: #86e5d8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: -0.003em;
+  }
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 clamp(1.2rem, 5vw, 2.2rem);
+  }
+
+  /* ---------- nav ---------- */
+  nav {
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  nav .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  nav .brand {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-decoration: none;
+  }
+  nav .links { display: flex; align-items: center; gap: 1.15rem; font-size: .9rem; }
+  nav .links a { color: var(--muted); text-decoration: none; }
+  nav .links a:hover { color: var(--accent); }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: -4px .15rem -4px 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .theme-toggle svg { width: 16px; height: 16px; display: block; }
+
+  .theme-toggle .i-sun { display: none; }
+  .theme-toggle .i-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .i-sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .i-moon { display: none; }
+  }
+  :root[data-theme="light"] .theme-toggle .i-sun { display: none; }
+  :root[data-theme="light"] .theme-toggle .i-moon { display: block; }
+  :root[data-theme="dark"] .theme-toggle .i-sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
+
+  /* ---------- profile ---------- */
+  header.profile {
+    padding: clamp(2.6rem, 7vw, 4.6rem) 0 2.4rem;
+    animation: rise .6s cubic-bezier(.2, .7, .3, 1) both;
+  }
+  .id-row { display: flex; gap: 1.6rem; align-items: center; flex-wrap: wrap; }
+  .avatar {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 2.4rem;
+    border: 1px solid var(--line);
+  }
+  .id-text h1 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    line-height: 1.1;
+    margin: 0 0 .3rem;
+    letter-spacing: -0.01em;
+  }
+  .id-text .role {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .82rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .tagline {
+    font-family: "Newsreader", Georgia, serif;
+    font-size: clamp(1.1rem, 2.6vw, 1.28rem);
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 1.6rem 0 0;
+  }
+  .contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: 1.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .8rem;
+  }
+  .contacts a, .contacts span {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .65rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .contacts a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- section shell ---------- */
+  section { padding: 2.6rem 0; border-top: 1px solid var(--line); }
+  .sec-label {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .74rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.1rem;
+  }
+  section > h2 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4vw, 1.9rem);
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  section p { color: var(--muted); max-width: 66ch; }
+  section p b { color: var(--ink); font-weight: 500; }
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .85em;
+    color: var(--code-ink);
+    background: var(--accent-soft);
+    padding: .06em .34em;
+    border-radius: 4px;
+  }
+
+  /* ---------- metrics ---------- */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.6rem 0 2rem;
+    box-shadow: var(--shadow);
+  }
+  .metric { background: var(--surface); padding: .95rem 1rem 1.05rem; }
+  .metric .n {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    display: block;
+  }
+  .metric .l { font-size: .72rem; color: var(--faint); margin-top: .25rem; }
+  @media (max-width: 620px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- work highlight cards ---------- */
+  .case {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.5rem 1.5rem 1.6rem;
+    margin-top: 1.1rem;
+    box-shadow: var(--shadow);
+  }
+  .case h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 .9rem;
+    display: flex;
+    align-items: baseline;
+    gap: .55rem;
+    flex-wrap: wrap;
+  }
+  .case h3 .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .68rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: .12rem .45rem;
+    border-radius: 4px;
+  }
+  .case dl { margin: 0; display: grid; grid-template-columns: 4.4rem 1fr; gap: .55rem 1rem; }
+  .case dt {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding-top: .15rem;
+  }
+  .case dd { margin: 0; color: var(--muted); font-size: .95rem; }
+  .case dd b { color: var(--ink); font-weight: 600; }
+  @media (max-width: 560px) {
+    .case dl { grid-template-columns: 1fr; gap: .2rem; }
+    .case dt { padding-top: .5rem; }
+  }
+
+  /* ---------- built list ---------- */
+  .built { display: grid; gap: 0; margin-top: 1rem; }
+  .built .item { padding: 1.15rem 0; border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
+  .built .item:first-child { border-top: 0; }
+  .built .k {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .76rem;
+    color: var(--accent);
+    margin-bottom: .3rem;
+  }
+  .built .k .role {
+    color: var(--faint);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: .03rem .35rem;
+    margin-left: .4rem;
+    font-size: .66rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .built h4 { margin: 0 0 .35rem; font-size: 1rem; font-weight: 600; }
+  .built p { margin: 0; font-size: .93rem; }
+
+  /* ---------- tables ---------- */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin-top: .4rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  th, td { text-align: left; padding: .8rem 1rem; vertical-align: top; border-top: 1px solid var(--line); }
+  thead th {
+    border-top: 0;
+    background: var(--surface-2);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-weight: 500;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  tbody td { background: var(--surface); color: var(--muted); }
+  tbody tr td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+  /* ---------- skills ---------- */
+  .skills { display: grid; gap: .1rem; }
+  .skills .row { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .7rem 0; border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
+  .skills .row:first-child { border-top: 0; }
+  .skills .cat {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .78rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding-top: .15rem;
+  }
+  .skills .vals { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .skills .vals span {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .82rem;
+    background: var(--surface-2);
+    padding: .18rem .55rem;
+    border-radius: 5px;
+  }
+  @media (max-width: 560px) { .skills .row { grid-template-columns: 1fr; gap: .35rem; } }
+
+  /* ---------- education ---------- */
+  .edu { display: flex; gap: 1.2rem; align-items: baseline; font-size: .96rem; }
+  .edu .when {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .82rem;
+    color: var(--faint);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .edu .what b { font-weight: 600; }
+  .edu .what span { color: var(--muted); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 2rem 0 3.5rem;
+    font-size: .8rem;
+    color: var(--faint);
+  }
+  footer .row1 { display: flex; gap: 1.1rem; flex-wrap: wrap; font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+  footer .note { margin-top: 1rem; line-height: 1.7; max-width: 70ch; }
+  footer .note code { background: var(--surface-2); color: var(--muted); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { header.profile { animation: none; } html { scroll-behavior: auto; } }
+</style>
+
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">Fidesss</a>
+    <div class="links">
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="테마 전환">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a href="https://github.com/Fidesss">GitHub</a>
+      <a href="https://velog.io/@cara1326">Velog</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <header class="profile">
+    <div class="id-row">
+      <!-- 실제 사진을 쓰려면 아래 div를 <img class="avatar" src="profile.jpg" alt="장동혁"> 로 교체 -->
+      <div class="avatar">장</div>
+      <div class="id-text">
+        <h1>장동혁</h1>
+        <div class="role">Backend Engineer</div>
+      </div>
+    </div>
+
+    <p class="tagline">
+      영상 스트리밍 콜백부터 AI 파싱 파이프라인까지,
+      서비스의 도메인을 처음부터 세워 온 Spring 백엔드 엔지니어입니다.
+    </p>
+
+    <div class="contacts">
+      <a href="mailto:caruh1326@gmail.com">✉ caruh1326@gmail.com</a>
+      <a href="https://github.com/Fidesss">↗ github.com/Fidesss</a>
+      <a href="https://velog.io/@cara1326">↗ velog.io/@cara1326</a>
+    </div>
+  </header>
+
+  <section>
+    <p class="sec-label">About</p>
+    <h2>여러 시스템에 걸친 상태를 정합성 있게 유지하는 일</h2>
+    <p>
+      <b>B-dink</b>에서 14개월간 백엔드를 담당하며 운동일지, AI 운동 메모 파싱, 동영상 스트리밍(외부 연동 및 자체 파이프라인 전환),
+      트레이너 구독, 알림 등 여러 도메인을 <b>처음부터 설계하고 구현</b>했습니다.
+      결제가 트레이너·구독·QR 발급으로 이어지는 흐름이나, 외부 영상 플랫폼의 콜백으로
+      시청 진행률을 맞추는 것처럼 <b>여러 시스템에 걸친 상태 흐름</b>을 다루는 작업에 강합니다.
+    </p>
+    <p>
+      새 요구사항이 들어오면 기존 코드에 끼워 넣기보다 도메인 경계를 다시 긋는 편이고,
+      외부 연동은 <code>external/*</code> 패키지로 격리하고 RAG용 벡터 DB는 주 트랜잭션 DB와
+      데이터소스를 분리하는 식으로 구조를 정리해 왔습니다.
+    </p>
+  </section>
+
+  <section>
+    <p class="sec-label">Selected Work</p>
+    <h2>B-dink — 온라인 클래스와 트레이닝을 잇는 스타트업</h2>
+    <p>
+      Spring Boot 3.2 / Java 17 기반 백엔드. 강의 수강과 헬스 트레이닝이 결합된 서비스로,
+      창업 초기에 <b>백엔드 개발자</b>로 합류해 아래 도메인 대부분을 단독으로 설계·구현했습니다.
+      <b>2025.04 – 2026.06</b>.
+    </p>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">352</span><span class="l">개인 커밋</span></div>
+      <div class="metric"><span class="n">+14.4k<span style="color:var(--faint)"> / −3.7k</span></span><span class="l">LOC 변경</span></div>
+      <div class="metric"><span class="n">14</span><span class="l">개월</span></div>
+      <div class="metric"><span class="n">346</span><span class="l">파일</span></div>
+    </div>
+
+    <div class="case">
+      <h3>AI 운동 메모 파싱 파이프라인 <span class="tag">openai · RAG</span></h3>
+      <dl>
+        <dt>문제</dt>
+        <dd>사용자가 자유롭게 쓴 메모("랫풀다운 70 80 80 / 8-12reps")를 운동·세트 구조로 저장해야 했습니다. LLM에 그대로 맡기면 DB에 없는 운동명을 지어내거나 JSON이 깨졌습니다.</dd>
+        <dt>접근</dt>
+        <dd>운동종목을 OpenAI 임베딩으로 벡터화해 <b>PostgreSQL pgvector에 저장</b>(주 DB와 데이터소스 분리). 메모를 줄 단위로 정규화(숫자·단위 제거)해 임베딩하고 코사인 거리로 후보를 추린 뒤, <b>그 후보 목록만 프롬프트에 주입</b>해 LLM이 목록 안에서만 매칭하도록 제약했습니다. system/user 메시지를 분리해 순수 JSON을 강제.</dd>
+        <dt>결과</dt>
+        <dd>자유 서술 → 구조화 데이터 자동 변환. 입력은 이메일·전화 마스킹 + SHA-256 해시로 로깅해 실패 케이스를 추적합니다.</dd>
+      </dl>
+    </div>
+
+    <div class="case">
+      <h3>영상 스트리밍 — Kollus 연동에서 자체 파이프라인으로 <span class="tag">kollus → aws · learning</span></h3>
+      <dl>
+        <dt>구현</dt>
+        <dd>강의 영상을 외부 플랫폼 <b>Kollus</b>로 서빙. 업로드·삭제·LMS·재생 <b>콜백 4종</b>을 구현하고, 재생 콜백의 <code>kind</code> 값에 따라 응답 구조가 달라 <code>kind</code>별 DTO로 분기. 회원별 UserKey와 전용 JWT로 보안 스트리밍 URL을 발급하고 <code>KollusMediaLink</code>로 시청 진행률을 추적했습니다.</dd>
+        <dt>이관</dt>
+        <dd>팀이 구축한 <b>자체 AWS 파이프라인</b>(S3 멀티파트 업로드 + CloudFront HLS)으로 옮겨가면서, 강의 도메인이 영상을 <b>Kollus 대신 AWS 미디어에서 받아오도록</b> 엔티티·서비스·응답 DTO를 전면 교체했습니다. <code>Lecture</code>의 Kollus 연관관계를 제거하고, 강의별 CDN URL 제공 API(<code>GET /lecture/{id}/media</code>, 이전/다음 강의 정보 포함)를 신설.</dd>
+        <dt>진행률 재설계</dt>
+        <dd>Kollus 콜백이 사라지며 깨진 진행률 로직을 걷어내고, <code>LearningProgress</code> · <code>LearningProgressEvent</code> 엔티티와 클라이언트 보고형 API(<code>POST /lecture/{id}/progress</code>)로 새로 설계했습니다. 되감아도 최대 진도율은 줄지 않고 한 번 완강한 강의는 롤백되지 않도록 정책을 엔티티에 캡슐화하고, 클래스룸·수강의 진도 집계를 여기에 맞춰 재작성.</dd>
+      </dl>
+    </div>
+
+    <div class="case">
+      <h3>AWS 계정 이관 · 인프라 재구축 <span class="tag">infra</span></h3>
+      <dl>
+        <dt>배경</dt>
+        <dd>AWS 프리티어가 만료되며 비용 구조를 바꿔야 했고, 신규 계정으로의 이관을 <b>단독으로 담당</b>했습니다.</dd>
+        <dt>이관</dt>
+        <dd>기존 인프라 구성(EC2 · RDS · S3/CloudFront · IAM)을 신규 계정에 <b>재구축</b>하고, RDS 덤프·복원과 S3 오브젝트 동기화, 애플리케이션의 접속 정보 · CDN 도메인 · 자격 증명 교체까지 수행했습니다. 이 과정에서 서비스 인프라 전 구간의 구성을 직접 파악·운영했습니다.</dd>
+        <dt>다음 단계</dt>
+        <dd>현재 배포는 수동 스크립트 방식으로, 이관 시 다운타임이 길었던 경험을 바탕으로 <b>GitHub Actions 기반 CI/CD와 무중단 배포</b> 도입을 계획하고 있습니다.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">What I Built</p>
+    <h2>담당한 도메인</h2>
+    <div class="built">
+      <div class="item">
+        <div class="k">workout <span class="role">설계·구현 전담</span></div>
+        <h4>운동일지 도메인</h4>
+        <p>세션·세트·운동종목·추천 루틴·피드백 엔티티 설계. 볼륨(중량×횟수) 통계 엔진(주간·일별 그래프, 지난주 대비 비교, 주간 랭킹), 운동 캘린더, 종목 검색, 클라이언트 동기화용 버전 체크 API. 피드백 미디어는 S3 presigned URL → CloudFront 변환.</p>
+      </div>
+      <div class="item">
+        <div class="k">openai <span class="role">전담</span></div>
+        <h4>AI 메모 파싱 · 임베딩 파이프라인</h4>
+        <p>pgvector 저장/검색 레이어, 임베딩 백필·동기화 러너, 줄 단위 정규화 및 RAG 후보 검색, 입력 로그(마스킹 + 해시).</p>
+      </div>
+      <div class="item">
+        <div class="k">sugang <span class="role">주도</span></div>
+        <h4>수강 도메인</h4>
+        <p>수강 신청·조회, 클래스룸별 학습 진행률 응답, 만료일 자동 스케줄러, 중복 처리.</p>
+      </div>
+      <div class="item">
+        <div class="k">center <span class="role">신규 구축 전담</span></div>
+        <h4>센터 도메인</h4>
+        <p>센터 CRUD, 강사–센터 연관관계, 센터/클래스룸 QR 코드 발급·검증(zxing).</p>
+      </div>
+      <div class="item">
+        <div class="k">trainer · trainermembership <span class="role">신규 구축</span></div>
+        <h4>트레이너 · 구독 도메인</h4>
+        <p>트레이너/센터장/소속 CRUD, principal 기반 담당 회원 조회, 회원 운동일지 조회 + 피드백. 구독: 결제 직후 트레이너·QR 자동 생성 → S3 업로드, 만료 스케줄러. <code>subscription → trainermembership</code> 패키지·스키마 리팩토링 주도.</p>
+      </div>
+      <div class="item">
+        <div class="k">notification <span class="role">전담</span></div>
+        <h4>알림 · FCM 푸시</h4>
+        <p>알림 엔티티/타입, soft delete, unread 조회. 도메인 이벤트(QR 등록, 피드백, 수강 신청, 답변)별 알림 생성을 <code>NotificationFactory</code>로 통합. FCM DeviceToken 관리, 딥링크별 푸시, 휴면 전환 시 토큰 비활성화.</p>
+      </div>
+      <div class="item">
+        <div class="k">learning <span class="role">설계·구현 전담</span></div>
+        <h4>학습 진행률</h4>
+        <p><code>LearningProgress</code>(강의별 최대 진도·완강 상태) + <code>LearningProgressEvent</code>(PLAY·HEARTBEAT·SEEK 등 원본 로그) 엔티티, 클라이언트 보고형 진행률 조회/저장 API. Kollus 콜백에 의존하던 클래스룸·수강 진도 집계를 이 엔티티 기준으로 전환.</p>
+      </div>
+      <div class="item">
+        <div class="k">global <span class="role">공통 유지관리</span></div>
+        <h4>공통 · 인프라</h4>
+        <p>표준 응답 포맷(<code>Success</code>/<code>Error</code> enum) 관리, Discord Webhook 자동화 + 테스트, 운영/개발 Swagger 분리, 멀티 데이터소스 설정, CoolSMS 인증 만료 검증.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Architecture</p>
+    <h2>구조화 관점 기여</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>관점</th><th>내용</th></tr></thead>
+        <tbody>
+          <tr><td>도메인 분리</td><td>신규 바운디드 컨텍스트 다수 설계 — <code>workout</code>, <code>openai</code>, <code>center</code>, <code>trainer*</code>, <code>notification</code>, <code>learning</code></td></tr>
+          <tr><td>외부 연동 격리</td><td>서드파티 연동을 <code>external/*</code> 패키지로 캡슐화 (Kollus 등)</td></tr>
+          <tr><td>인프라 이관</td><td>영상 소스를 외부 플랫폼(Kollus)에서 자체 AWS(CloudFront HLS)로 이관 — 강의 도메인 교체·CDN URL API·진행률 재설계 담당</td></tr>
+          <tr><td>데이터소스 분리</td><td>RAG용 pgvector를 주 트랜잭션 DB와 분리된 데이터소스로 구성</td></tr>
+          <tr><td>이벤트 오케스트레이션</td><td>결제 → 트레이너 / 구독 / QR 자동 생성으로 이어지는 흐름 설계</td></tr>
+          <tr><td>알림 통합</td><td>도메인 이벤트 → <code>NotificationFactory</code> 패턴으로 생성 지점 일원화</td></tr>
+          <tr><td>리팩토링 주도</td><td><code>subscription → trainermembership</code> 패키지·스키마·API 경로 전면 정리</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Project</p>
+    <h2>May-I — AI Integrated Platform 백엔드</h2>
+    <p>
+      Spring Boot · Spring Security · OAuth2 · JWT · MySQL — 2025.03 – 04 · 53 커밋 ·
+      <b>인증 / 사용자 레이어를 단독 담당</b>했습니다.
+    </p>
+    <div class="built">
+      <div class="item">
+        <div class="k">user · auth</div>
+        <h4>회원 · 인증</h4>
+        <p><code>User</code> 도메인(엔티티 · Repository · DTO · Service 인터페이스/구현체), <code>SecurityConfig</code> 필터 체인, 회원가입 · 일반 로그인.</p>
+      </div>
+      <div class="item">
+        <div class="k">jwt</div>
+        <h4>JWT 인증</h4>
+        <p>액세스 토큰 생성·검증(<code>JwtUtil</code>)과 요청별 검증 필터, 토큰을 <b>HttpOnly 쿠키</b>로 전달하며 SameSite · domain 설정(<code>CookieUtil</code>).</p>
+      </div>
+      <div class="item">
+        <div class="k">oauth</div>
+        <h4>소셜 로그인 (Google · Kakao · Naver)</h4>
+        <p><code>OAuth2UserInfo</code> 인터페이스로 공급자를 추상화해 3종 소셜 로그인과 프로필 사진 저장·조회를 구현. 신규 공급자는 구현체만 추가하면 되도록 인터페이스+Service 구조로 리팩토링.</p>
+      </div>
+      <div class="item">
+        <div class="k">apiPayload</div>
+        <h4>전역 예외 처리</h4>
+        <p><code>GlobalExceptionHandler</code>와 도메인별 핸들러(JWT · 소셜 로그인 · User)로 커스텀 예외 응답을 표준화.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Skills</p>
+    <h2>기술 스택</h2>
+    <div class="skills">
+      <div class="row"><div class="cat">Language</div><div class="vals"><span>Java 17</span><span>Python</span></div></div>
+      <div class="row"><div class="cat">Framework</div><div class="vals"><span>Spring Boot 3.2</span><span>Spring Data JPA</span><span>Spring Security</span><span>Spring WebFlux</span></div></div>
+      <div class="row"><div class="cat">Database</div><div class="vals"><span>MySQL</span><span>PostgreSQL · pgvector</span></div></div>
+      <div class="row"><div class="cat">Infra</div><div class="vals"><span>AWS EC2</span><span>RDS</span><span>S3 · CloudFront</span><span>IAM</span><span>Docker</span></div></div>
+      <div class="row"><div class="cat">Integration</div><div class="vals"><span>Kollus</span><span>Firebase FCM</span><span>OpenAI API</span><span>CoolSMS</span><span>카카오 알림톡</span></div></div>
+      <div class="row"><div class="cat">Testing</div><div class="vals"><span>JUnit 5</span></div></div>
+      <div class="row"><div class="cat">Tools</div><div class="vals"><span>Gradle</span><span>Swagger</span><span>Git</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Education</p>
+    <h2>학력</h2>
+    <div class="edu">
+      <div class="when">2020.03 – 2026.02</div>
+      <div class="what"><b>서경대학교</b> <span>소프트웨어학과</span></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="row1">
+      <span>© 2026 장동혁</span>
+      <a href="https://github.com/Fidesss">GitHub</a>
+      <a href="https://velog.io/@cara1326">Velog</a>
+      <a href="mailto:caruh1326@gmail.com">Email</a>
+    </div>
+    <p class="note">
+      B-dink 저장소의 커밋은 두 계정명(<code>Fidesss</code>, <code>Caruh</code>)으로 남아 있으며 동일 계정입니다.
+      "전담 / 주도"는 해당 파일·패키지의 커밋 대부분이 본인 저자임을 뜻합니다
+      (예: <code>WorkoutService</code> 44커밋 중 44건, <code>KollusService</code> 31커밋 중 31건).
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function current() {
+      var t = root.getAttribute('data-theme');
+      if (t === 'dark' || t === 'light') return t;
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    function sync() {
+      btn.setAttribute('aria-label', current() === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환');
+      btn.title = btn.getAttribute('aria-label');
+    }
+    sync();
+    btn.addEventListener('click', function () {
+      var next = current() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
+</script>
+
+</body>
+</html>
